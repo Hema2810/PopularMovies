@@ -10,11 +10,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-public class MovieUtils {
+class MovieUtils {
 
 
    // Variable for logging messages
-    public static final String LOG_TAG = MovieUtils.class.getSimpleName();
+   private static final String LOG_TAG = MovieUtils.class.getSimpleName();
     private static final String HTTP_REQUEST ="GET";
     private static final int HTTP_CONNECTION_TIMEOUT=10000;
     private static final int HTTP_READ_TIMEOUT=15000;

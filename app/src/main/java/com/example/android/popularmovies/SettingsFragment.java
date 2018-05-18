@@ -44,7 +44,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     }
 
-    public void setListPreferenceSummary(Preference preference, SharedPreferences sharedPreferences) {
+    private void setListPreferenceSummary(Preference preference, SharedPreferences sharedPreferences) {
         if (!(preference instanceof CheckBoxPreference)) {
             String value = sharedPreferences.getString(preference.getKey(), "");
             if (preference instanceof ListPreference) {

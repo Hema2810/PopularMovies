@@ -29,19 +29,19 @@ public class MoviesActivity extends AppCompatActivity implements
     //This app uses the themoviedb.org API to get the movies list and details
 
     public static int NUM_GRID_COLUMNS = 2;
-    private static int SCREEN_WIDTH600 = 600;
-    private static int SCREEN_WIDTH720 = 720;
-    private static String SORT_KEY ="sort";
-    private static String DEFAULT_SORT ="popular";
-    private static String KEY ="Movies";
-    private static String BUNDLE_KEY ="query";
-    private static String POPULAR_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-    private static String TOP_QUERY = "https://api.themoviedb.org/3/movie/top_rated?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    private static final int SCREEN_WIDTH600 = 600;
+    private static final int SCREEN_WIDTH720 = 720;
+    private static final String SORT_KEY = "sort";
+    private static final String DEFAULT_SORT = "popular";
+    private static final String KEY = "Movies";
+    private static final String BUNDLE_KEY = "query";
+    private static final String POPULAR_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    private static final String TOP_QUERY = "https://api.themoviedb.org/3/movie/top_rated?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
-    private ArrayList<MovieInfo> mMovies = new ArrayList<MovieInfo>();
+    private ArrayList<MovieInfo> mMovies = new ArrayList<>();
     private static final int MOVIE_LOADER = 22;
-    GridLayoutManager layoutManager;
-    RecyclerView mRecyclerView;
+    private GridLayoutManager layoutManager;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MoviesActivity extends AppCompatActivity implements
         }
 
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_movies);
+        mRecyclerView = findViewById(R.id.rv_movies);
         layoutManager = new GridLayoutManager(this, NUM_GRID_COLUMNS);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -136,16 +136,16 @@ public class MoviesActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int itemid = item.getItemId();
-        if (itemid == R.id.preferece_settings) {
-            Intent preferanceSettingsIntent = new Intent(this, Settings.class);
-            startActivity(preferanceSettingsIntent);
+        int itemId = item.getItemId();
+        if (itemId == R.id.preference_settings) {
+            Intent preferenceSettingsIntent = new Intent(this, Settings.class);
+            startActivity(preferenceSettingsIntent);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadMovieImages(String jsonString) {
+    private void loadMovieImages(String jsonString) {
 
         String baseUrl = "http://image.tmdb.org/t/p/";
         String imageSize = "w185";

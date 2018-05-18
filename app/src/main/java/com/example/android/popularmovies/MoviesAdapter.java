@@ -14,42 +14,40 @@ import java.util.ArrayList;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder> {
 
-    private ArrayList<MovieInfo> mMovieInfo;
-    private Context mContext;
-    public static final float IMAGEVIEW_HEIGHT_RATIO = (float) 1.5;
+    private static final float IMAGEVIEW_HEIGHT_RATIO = (float) 1.5;
+    private final ArrayList<MovieInfo> mMovieInfo;
 
     public MoviesAdapter(ArrayList<MovieInfo> movieInfo) {
         this.mMovieInfo = movieInfo;
 
     }
 
-    class MoviesViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView mMovieImageView;
-
-        public MoviesViewHolder(View itemView) {
-            super(itemView);
-            mMovieImageView = (ImageView) itemView.findViewById(R.id.iv_movies);
-            int gridWidth = itemView.getContext().getResources().getDisplayMetrics().widthPixels / MoviesActivity.NUM_GRID_COLUMNS;
-            mMovieImageView.setMinimumWidth(gridWidth);
-            int gridheight = (int) (gridWidth * IMAGEVIEW_HEIGHT_RATIO);
-            mMovieImageView.setMinimumHeight(gridheight);
-
-        }
-    }
-
-
     @Override
     public MoviesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        mContext = parent.getContext();
+        Context mContext = parent.getContext();
         int layoutIdForMovie = R.layout.movie_grid;
         LayoutInflater inflater = LayoutInflater.from(mContext);
         boolean attachToParentImmediately = false;
 
-        View view = inflater.inflate(layoutIdForMovie, parent, attachToParentImmediately);
+        View view = inflater.inflate(layoutIdForMovie, parent, false);
         return new MoviesViewHolder(view);
 
+    }
+
+    class MoviesViewHolder extends RecyclerView.ViewHolder {
+
+        final ImageView mMovieImageView;
+
+        MoviesViewHolder(View itemView) {
+            super(itemView);
+            mMovieImageView = itemView.findViewById(R.id.iv_movies);
+            int gridWidth = itemView.getContext().getResources().getDisplayMetrics().widthPixels / MoviesActivity.NUM_GRID_COLUMNS;
+            mMovieImageView.setMinimumWidth(gridWidth);
+            int gridHeight = (int) (gridWidth * IMAGEVIEW_HEIGHT_RATIO);
+            mMovieImageView.setMinimumHeight(gridHeight);
+
+        }
     }
 
     @Override

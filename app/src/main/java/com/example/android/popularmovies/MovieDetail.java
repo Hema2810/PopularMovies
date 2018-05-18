@@ -21,14 +21,19 @@ public class MovieDetail extends AppCompatActivity {
 
     MovieInfo mMovieInfo;
     @BindView(R.id.title_tv)
+
     TextView title;
     @BindView(R.id.release_date_tv)
+
     TextView releaseDate;
     @BindView(R.id.synopsis_tv)
+
     TextView synopsis;
     @BindView(R.id.user_rating_tv)
+
     TextView userRating;
     @BindView(R.id.movie_poster_iv)
+
     ImageView posterImage;
 
     @Override
@@ -43,7 +48,7 @@ public class MovieDetail extends AppCompatActivity {
         Intent parentActivityIntent = getIntent();
         if (parentActivityIntent != null) {
             if (parentActivityIntent.getExtras() != null) {
-                mMovieInfo = (MovieInfo) parentActivityIntent.getParcelableExtra(Intent.EXTRA_TEXT);
+                mMovieInfo = parentActivityIntent.getParcelableExtra(Intent.EXTRA_TEXT);
             }
 
         }

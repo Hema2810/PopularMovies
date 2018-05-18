@@ -17,11 +17,11 @@ public class MovieInfo implements Parcelable {
             return new MovieInfo[size];
         }
     };
-    String mMovieTitle;
+    private String mMovieTitle;
     String mThumbnailImage;
-    String mReleaseDate;
-    String mSynopsis;
-    String mRating;
+    private String mReleaseDate;
+    private String mSynopsis;
+    private String mRating;
 
 
     public MovieInfo(String mMovieTitle, String mThumbnailImage, String mReleaseDate, String mSynopsis, String mRating) {
@@ -32,7 +32,7 @@ public class MovieInfo implements Parcelable {
         this.mRating = mRating;
     }
 
-    protected MovieInfo(Parcel in) {
+    private MovieInfo(Parcel in) {
         mMovieTitle = in.readString();
         mThumbnailImage = in.readString();
         mReleaseDate = in.readString();
@@ -44,41 +44,51 @@ public class MovieInfo implements Parcelable {
         return mMovieTitle;
     }
 
-    public void setMovieTitle(String mMovieTitle) {
-        this.mMovieTitle = mMovieTitle;
-    }
+// --Commented out by Inspection START (5/17/18, 9:00 PM):
+//    public void setMovieTitle(String mMovieTitle) {
+//        this.mMovieTitle = mMovieTitle;
+//    }
+// --Commented out by Inspection STOP (5/17/18, 9:00 PM)
 
     public String getReleaseDate() {
         return mReleaseDate;
     }
 
-    public void setReleaseDate(String mReleaseDate) {
-        this.mReleaseDate = mReleaseDate;
-    }
+// --Commented out by Inspection START (5/17/18, 9:00 PM):
+//    public void setReleaseDate(String mReleaseDate) {
+//        this.mReleaseDate = mReleaseDate;
+//    }
+// --Commented out by Inspection STOP (5/17/18, 9:00 PM)
 
     public String getSynopsis() {
         return mSynopsis;
     }
 
-    public void setSynopsis(String mSynopsis) {
-        this.mSynopsis = mSynopsis;
-    }
+// --Commented out by Inspection START (5/17/18, 9:00 PM):
+//    public void setSynopsis(String mSynopsis) {
+//        this.mSynopsis = mSynopsis;
+//    }
+// --Commented out by Inspection STOP (5/17/18, 9:00 PM)
 
     public String getThumbnailImage() {
         return mThumbnailImage;
     }
 
-    public void setThumbnailImage(String mThumbnailImage) {
-        this.mThumbnailImage = mThumbnailImage;
-    }
+// --Commented out by Inspection START (5/17/18, 9:00 PM):
+//    public void setThumbnailImage(String mThumbnailImage) {
+//        this.mThumbnailImage = mThumbnailImage;
+//    }
+// --Commented out by Inspection STOP (5/17/18, 9:00 PM)
 
     public String getRating() {
         return mRating;
     }
 
-    public void setRating(String mRating) {
-        this.mRating = mRating;
-    }
+// --Commented out by Inspection START (5/17/18, 9:00 PM):
+//    public void setRating(String mRating) {
+//        this.mRating = mRating;
+//    }
+// --Commented out by Inspection STOP (5/17/18, 9:00 PM)
 
     @Override
     public int describeContents() {
