@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">PopularMovies</string>
+    <!--labels for sort order-->
+    <string name="most_popular_label">Most Popular</string>
+    <string name="top_rated_label">Top Rated</string>
+
+    <string name="sort_order">Sort</string>
+    <string name="sort_key" translatable="false">sort</string>
+    <!-- value for sort order -->
+    <string name="most_popular_value">popular</string>
+    <string name="top_rated_value">top</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="release_date">Release Date</string>
+    <string name="synopsis">Synopsis</string>
+    <string name="user_rating">User Rating</string>
+    <string name="title">Movie Title</string>
+    <string name="settings">Settings</string>
+
+
+</resources>
