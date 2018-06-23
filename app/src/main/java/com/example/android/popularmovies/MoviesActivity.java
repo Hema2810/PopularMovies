@@ -1,8 +1,13 @@
 package com.example.android.popularmovies;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
@@ -14,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +29,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+
 public class MoviesActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<String>, SharedPreferences.OnSharedPreferenceChangeListener {
+        LoaderManager.LoaderCallbacks<String>,
+        MoviesAdapter.onMovieClickedListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     //This app uses the themoviedb.org API to get the movies list and details
 
@@ -35,13 +44,18 @@ public class MoviesActivity extends AppCompatActivity implements
     private static final String DEFAULT_SORT = "popular";
     private static final String KEY = "Movies";
     private static final String BUNDLE_KEY = "query";
-    private static final String POPULAR_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-    private static final String TOP_QUERY = "https://api.themoviedb.org/3/movie/top_rated?api_key=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    private static final String POPULAR_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=" + BuildConfig.API_KEY;
+    private static final String TOP_QUERY = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + BuildConfig.API_KEY;
 
     private ArrayList<MovieInfo> mMovies = new ArrayList<>();
     private static final int MOVIE_LOADER = 22;
     private GridLayoutManager layoutManager;
     private RecyclerView mRecyclerView;
+
+    String mCurrentSortKey;
+    ConnectivityManager connectivityManager;
+    ConnectionReceiver mReceiver = new ConnectionReceiver();
+    IntentFilter receiverFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +63,12 @@ public class MoviesActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_movies);
         int screenSize = (int) (this.getResources().getDisplayMetrics().widthPixels / this.getResources().getDisplayMetrics().density);
 
-        if (screenSize>SCREEN_WIDTH720){
-            NUM_GRID_COLUMNS=4;}
-        if (screenSize > SCREEN_WIDTH600){
-            NUM_GRID_COLUMNS = 3;}
-        else {
+        if (screenSize > SCREEN_WIDTH720) {
+            NUM_GRID_COLUMNS = 4;
+        }
+        if (screenSize > SCREEN_WIDTH600) {
+            NUM_GRID_COLUMNS = 3;
+        } else {
             NUM_GRID_COLUMNS = 2;
         }
 
@@ -63,20 +78,54 @@ public class MoviesActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
+        registerReceiver(mReceiver, receiverFilter);
+
         SharedPreferences sharedPreferences =
                 android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
+
         if (savedInstanceState == null || !savedInstanceState.containsKey(KEY)) {
             String sortBy = sharedPreferences.getString(SORT_KEY, DEFAULT_SORT);
-            String queryUrl = getQueryUrl(sortBy);
-            updateUI(queryUrl);
+            mCurrentSortKey = sortBy;
+            connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+
+            if (isConnected) {
+                String queryUrl = getQueryUrl(sortBy);
+                updateUI(queryUrl);
+            } else {
+                Toast.makeText(this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+
+            }
+
         } else {
             mMovies = savedInstanceState.getParcelableArrayList(KEY);
-            MoviesAdapter mAdapter = new MoviesAdapter(mMovies);
+            MoviesAdapter mAdapter = new MoviesAdapter(mMovies, this);
             mRecyclerView.setAdapter(mAdapter);
         }
     }
+
+    private void updateUI(String queryUrl) {
+
+
+        Bundle queryBundle = new Bundle();
+        queryBundle.putString(BUNDLE_KEY, queryUrl);
+        LoaderManager loaderManager = getSupportLoaderManager();
+
+        Loader<String> loader = loaderManager.getLoader(MOVIE_LOADER);
+
+        if (loader == null) {
+            loaderManager.initLoader(MOVIE_LOADER, queryBundle, this);
+        } else {
+            loaderManager.restartLoader(MOVIE_LOADER, queryBundle, this);
+        }
+
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -95,28 +144,27 @@ public class MoviesActivity extends AppCompatActivity implements
 
     }
 
-    private void updateUI(String queryUrl) {
-        Bundle queryBundle = new Bundle();
-        queryBundle.putString(BUNDLE_KEY, queryUrl);
-        LoaderManager loaderManager = getSupportLoaderManager();
-
-        Loader<String> loader = loaderManager.getLoader(MOVIE_LOADER);
-
-        if (loader == null) {
-            loaderManager.initLoader(MOVIE_LOADER, queryBundle, this);
-        } else {
-            loaderManager.restartLoader(MOVIE_LOADER, queryBundle, this);
-        }
-
-    }
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         String queryUrl = null;
-        if (key.equals(getString(R.string.sort_key)))
-            queryUrl = getQueryUrl(sharedPreferences.getString(key, DEFAULT_SORT));
-        mMovies.clear();
-        updateUI(queryUrl);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        mCurrentSortKey = sharedPreferences.getString(key, DEFAULT_SORT);
+        if (isConnected) {
+            if (key.equals(getString(R.string.sort_key)))
+                queryUrl = getQueryUrl(mCurrentSortKey);
+            mMovies.clear();
+            updateUI(queryUrl);
+        } else {
+            Toast.makeText(this, "Please check your internet connection", Toast.LENGTH_LONG).show();
+            mMovies.clear();
+            updateUI(queryUrl);
+
+        }
 
     }
 
@@ -125,36 +173,19 @@ public class MoviesActivity extends AppCompatActivity implements
         super.onDestroy();
         PreferenceManager.getDefaultSharedPreferences(this).
                 unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.preference_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.preference_settings) {
-            Intent preferenceSettingsIntent = new Intent(this, Settings.class);
-            startActivity(preferenceSettingsIntent);
-        }
-
-        return super.onOptionsItemSelected(item);
+        unregisterReceiver(mReceiver);
     }
 
     private void loadMovieImages(String jsonString) {
 
         String baseUrl = "http://image.tmdb.org/t/p/";
         String imageSize = "w185";
-        String resultsKey ="results";
+        String resultsKey = "results";
         String posterPathKey = "poster_path";
-        String originalTitleKey ="original_title";
-        String releaseDateKey ="release_date";
-        String synopsisKey="overview";
-        String ratingKey="vote_average";
+        String originalTitleKey = "original_title";
+        String releaseDateKey = "release_date";
+        String synopsisKey = "overview";
+        String ratingKey = "vote_average";
 
         try {
             JSONObject movie = new JSONObject(jsonString);
@@ -178,6 +209,34 @@ public class MoviesActivity extends AppCompatActivity implements
         }
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.preference_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.preference_settings) {
+            Intent preferenceSettingsIntent = new Intent(this, Settings.class);
+            startActivity(preferenceSettingsIntent);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data) {
+
+        loadMovieImages(data);
+        MoviesAdapter mAdapter = new MoviesAdapter(mMovies, this);
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
+
     @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<String> onCreateLoader(int id, final Bundle args) {
@@ -204,13 +263,13 @@ public class MoviesActivity extends AppCompatActivity implements
         };
     }
 
-
     @Override
-    public void onLoadFinished(Loader<String> loader, String data) {
+    public void onMovieClicked(int clickedMovieIndex) {
+        // Toast.makeText(this, "mainActivity clicked movie index "+ clickedMovieIndex, Toast.LENGTH_SHORT).show();
+        Intent detailIntent = new Intent(this, MovieDetail.class);
+        detailIntent.putExtra(Intent.EXTRA_TEXT, mMovies.get(clickedMovieIndex));
+        startActivity(detailIntent);
 
-        loadMovieImages(data);
-        MoviesAdapter mAdapter = new MoviesAdapter(mMovies);
-        mRecyclerView.setAdapter(mAdapter);
 
     }
 
@@ -219,6 +278,31 @@ public class MoviesActivity extends AppCompatActivity implements
         loader.forceLoad();
     }
 
+    class ConnectionReceiver extends BroadcastReceiver {
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+
+                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+
+                if (mMovies.size() == 0 && isConnected) {
+                    String queryUrl = getQueryUrl(mCurrentSortKey);
+                    updateUI(queryUrl);
+                }
+
+
+            }
+        }
+    }
+
 
 }
+
+
 
