@@ -1,7 +1,6 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +15,26 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
     private static final float IMAGEVIEW_HEIGHT_RATIO = (float) 1.5;
     private final ArrayList<MovieInfo> mMovieInfo;
+    final private onMovieClickedListener mMovieClickedListener;
 
-    public MoviesAdapter(ArrayList<MovieInfo> movieInfo) {
+    public MoviesAdapter(ArrayList<MovieInfo> movieInfo, onMovieClickedListener listener) {
         this.mMovieInfo = movieInfo;
+        mMovieClickedListener = listener;
+
+    }
+
+    @Override
+    public void onBindViewHolder(final MoviesViewHolder holder, int position) {
+
+        final int ePosition = position;
+
+
+        Picasso.with(holder.mMovieImageView.getContext())
+                .load(mMovieInfo.get(position).mThumbnailImage)
+                .placeholder(R.drawable.baseline_image_search_24)
+                .error(R.drawable.baseline_image_search_24)
+                .into(holder.mMovieImageView);
+
 
     }
 
@@ -35,7 +51,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
     }
 
-    class MoviesViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemCount() {
+        return mMovieInfo.size();
+    }
+
+    public interface onMovieClickedListener {
+        void onMovieClicked(int clickedMovieIndex);
+    }
+
+    class MoviesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         final ImageView mMovieImageView;
 
@@ -46,40 +71,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
             mMovieImageView.setMinimumWidth(gridWidth);
             int gridHeight = (int) (gridWidth * IMAGEVIEW_HEIGHT_RATIO);
             mMovieImageView.setMinimumHeight(gridHeight);
+            itemView.setOnClickListener(this);
 
         }
+
+        @Override
+        public void onClick(View v) {
+            int moviePostition = getAdapterPosition();
+            mMovieClickedListener.onMovieClicked(moviePostition);
+        }
     }
-
-    @Override
-    public void onBindViewHolder(final MoviesViewHolder holder,  int position) {
-
-        final int ePosition = position;
-
-
-        Picasso.with(holder.mMovieImageView.getContext())
-                .load(mMovieInfo.get(position).mThumbnailImage)
-                .placeholder(R.drawable.baseline_image_search_24)
-                .error(R.drawable.baseline_image_search_24)
-                .into(holder.mMovieImageView);
-
-
-        holder.mMovieImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent detailIntent = new Intent(holder.itemView.getContext(), MovieDetail.class);
-                detailIntent.putExtra(Intent.EXTRA_TEXT, mMovieInfo.get(ePosition));
-                holder.itemView.getContext().startActivity(detailIntent);
-                //Toast.makeText(holder.itemView.getContext(), "onClick Listener at " + position, Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mMovieInfo.size();
-    }
-
 
 }
 
