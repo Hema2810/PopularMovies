@@ -14,11 +14,12 @@ import java.util.ArrayList;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder> {
 
     private static final float IMAGEVIEW_HEIGHT_RATIO = (float) 1.5;
-    private final ArrayList<MovieInfo> mMovieInfo;
+    private ArrayList<MovieInfo> mMovieInfo;
     final private onMovieClickedListener mMovieClickedListener;
+    private Context mContext;
 
-    public MoviesAdapter(ArrayList<MovieInfo> movieInfo, onMovieClickedListener listener) {
-        this.mMovieInfo = movieInfo;
+    public MoviesAdapter(Context context, onMovieClickedListener listener) {
+        mContext = context;
         mMovieClickedListener = listener;
 
     }
@@ -36,6 +37,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
                 .into(holder.mMovieImageView);
 
 
+    }
+
+    public void setMovies(ArrayList<MovieInfo> movieList) {
+        mMovieInfo = movieList;
+        notifyDataSetChanged();
     }
 
     @Override

@@ -1,8 +1,12 @@
 package com.example.android.popularmovies;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@Entity
 public class MovieInfo implements Parcelable {
 
 
@@ -17,6 +21,10 @@ public class MovieInfo implements Parcelable {
             return new MovieInfo[size];
         }
     };
+    @PrimaryKey
+    private int id;
+    @Ignore
+    private int mFavorite = 0;
     private String mMovieTitle;
     String mThumbnailImage;
     private String mReleaseDate;
@@ -24,20 +32,37 @@ public class MovieInfo implements Parcelable {
     private String mRating;
 
 
-    public MovieInfo(String mMovieTitle, String mThumbnailImage, String mReleaseDate, String mSynopsis, String mRating) {
+    public MovieInfo(int id, String mMovieTitle, String mThumbnailImage, String mReleaseDate, String mSynopsis, String mRating) {
+        this.id = id;
         this.mMovieTitle = mMovieTitle;
         this.mThumbnailImage = mThumbnailImage;
         this.mReleaseDate = mReleaseDate;
         this.mSynopsis = mSynopsis;
         this.mRating = mRating;
+
+
     }
 
     private MovieInfo(Parcel in) {
+        id = in.readInt();
         mMovieTitle = in.readString();
         mThumbnailImage = in.readString();
         mReleaseDate = in.readString();
         mSynopsis = in.readString();
         mRating = in.readString();
+        mFavorite = in.readInt();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getFavorite() {
+        return mFavorite;
+    }
+
+    public void setFavorite(int isFavorite) {
+        mFavorite = isFavorite;
     }
 
     public String getMovieTitle() {
@@ -97,6 +122,7 @@ public class MovieInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(mMovieTitle);
         dest.writeString(mThumbnailImage);
         dest.writeString(mReleaseDate);
