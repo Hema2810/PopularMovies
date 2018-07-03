@@ -12,30 +12,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-    <activity
-        android:name=".MoviesActivity"
-        android:launchMode="singleTop">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".MoviesActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-    <activity
-        android:name=".Settings"
-        android:label="PreferenceActivity"
-        android:parentActivityName=".MoviesActivity">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MoviesActivity" />
-    </activity>
-    <activity
-        android:name=".MovieDetail"
-        android:parentActivityName=".MoviesActivity">
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MoviesActivity" />
-    </activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Settings"
+            android:label="PreferenceActivity"
+            android:parentActivityName=".MoviesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MoviesActivity" />
+        </activity>
+        <activity
+            android:name=".MovieDetail"
+            android:parentActivityName=".MoviesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MoviesActivity" />
+        </activity>
     </application>
 
 </manifest>
