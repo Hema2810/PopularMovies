@@ -13,16 +13,15 @@ import java.nio.charset.Charset;
 class MovieUtils {
 
 
-   // Variable for logging messages
-   private static final String LOG_TAG = MovieUtils.class.getSimpleName();
-    private static final String HTTP_REQUEST ="GET";
-    private static final int HTTP_CONNECTION_TIMEOUT=10000;
-    private static final int HTTP_READ_TIMEOUT=15000;
-    private static final int HTTP_SUCCESS_RESPONSE_CODE=200;
+    // Variable for logging messages
+    private static final String LOG_TAG = MovieUtils.class.getSimpleName();
+    private static final String HTTP_REQUEST = "GET";
+    private static final int HTTP_CONNECTION_TIMEOUT = 10000;
+    private static final int HTTP_READ_TIMEOUT = 15000;
+    private static final int HTTP_SUCCESS_RESPONSE_CODE = 200;
 
 
-
-   //  Method to make an HTTP request and get a json string
+    //  Method to make an HTTP request and get a json string
     public static String httpRequest(URL url) throws IOException {
 
         String jsonString = "";
@@ -48,8 +47,7 @@ class MovieUtils {
             } else {
                 Log.e(LOG_TAG, "Error! response code: " + urlConnection.getResponseCode());
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Problem retrieving Movie Information", e);
         } finally {
             if (urlConnection != null) {

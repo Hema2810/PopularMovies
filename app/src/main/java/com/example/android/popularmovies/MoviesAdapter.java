@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder> {
 
     private static final float IMAGEVIEW_HEIGHT_RATIO = (float) 1.5;
-    private ArrayList<MovieInfo> mMovieInfo;
     final private onMovieClickedListener mMovieClickedListener;
+    private ArrayList<MovieInfo> mMovieInfo;
     private Context mContext;
 
     public MoviesAdapter(Context context, onMovieClickedListener listener) {
@@ -83,8 +83,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
         @Override
         public void onClick(View v) {
-            int moviePostition = getAdapterPosition();
-            mMovieClickedListener.onMovieClicked(moviePostition);
+            int moviePosition = getAdapterPosition();
+            mMovieClickedListener.onMovieClicked(moviePosition);
         }
     }
 

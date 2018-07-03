@@ -41,7 +41,6 @@ public class MoviesActivity extends AppCompatActivity implements
 
     //This app uses the themoviedb.org API to get the movies list and details
 
-    public static int NUM_GRID_COLUMNS = 2;
     private static final int SCREEN_WIDTH600 = 600;
     private static final int SCREEN_WIDTH720 = 720;
     private static final String SORT_KEY = "sort";
@@ -52,18 +51,17 @@ public class MoviesActivity extends AppCompatActivity implements
     private static final String POPULAR_QUERY = "https://api.themoviedb.org/3/movie/popular?api_key=" + BuildConfig.API_KEY;
     private static final String TOP_QUERY = "https://api.themoviedb.org/3/movie/top_rated?api_key=" + BuildConfig.API_KEY;
     private static final String FAVORITE_SORT = "favorite";
-
-    private ArrayList<MovieInfo> mMovies = new ArrayList<>();
-    final MoviesAdapter mAdapter = new MoviesAdapter(this, this);
     private static final int MOVIE_LOADER = 22;
-    private GridLayoutManager layoutManager;
-    private RecyclerView mRecyclerView;
-    private ArrayList<MovieInfo> favouriteMovies = new ArrayList<>();
-
+    public static int NUM_GRID_COLUMNS = 2;
+    final MoviesAdapter mAdapter = new MoviesAdapter(this, this);
     String mCurrentSortKey;
     ConnectivityManager connectivityManager;
     ConnectionReceiver mReceiver = new ConnectionReceiver();
     IntentFilter receiverFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+    private ArrayList<MovieInfo> mMovies = new ArrayList<>();
+    private GridLayoutManager layoutManager;
+    private RecyclerView mRecyclerView;
+    private ArrayList<MovieInfo> favouriteMovies = new ArrayList<>();
     private MovieDatabase mDb;
 
     @Override
@@ -110,7 +108,7 @@ public class MoviesActivity extends AppCompatActivity implements
 
     }
 
-    private void updateUI(String queryUrl) {
+    private void getJsonResponse(String queryUrl) {
 
         if (queryUrl != null) {
             Bundle queryBundle = new Bundle();
@@ -135,7 +133,7 @@ public class MoviesActivity extends AppCompatActivity implements
             viewModel.getMovies().observe(this, new Observer<List<MovieInfo>>() {
                 @Override
                 public void onChanged(@Nullable List<MovieInfo> movieInfos) {
-                    if (movieInfos.size() > 0) {
+                    if (movieInfos != null) {
                         favouriteMovies.clear();
                         favouriteMovies.addAll(movieInfos);
 
@@ -145,7 +143,6 @@ public class MoviesActivity extends AppCompatActivity implements
                 }
             });
 
-
         } else {
 
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -154,7 +151,7 @@ public class MoviesActivity extends AppCompatActivity implements
 
             if (isConnected) {
                 String queryUrl = getQueryUrl(sortBy);
-                updateUI(queryUrl);
+                getJsonResponse(queryUrl);
                 try {
                     unregisterReceiver(mReceiver);
                 } catch (IllegalArgumentException e) {
@@ -168,7 +165,6 @@ public class MoviesActivity extends AppCompatActivity implements
 
             }
         }
-
 
     }
 
@@ -208,7 +204,7 @@ public class MoviesActivity extends AppCompatActivity implements
 
     }
 
-    private ArrayList<MovieInfo> loadMovieImages(String jsonString) {
+    private ArrayList<MovieInfo> parseJson(String jsonString) {
 
         String baseUrl = "http://image.tmdb.org/t/p/";
         String imageSize = "w185";
@@ -267,10 +263,9 @@ public class MoviesActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
-//        throw new Exception("test");
 
         if (!mCurrentSortKey.equals(FAVORITE_SORT)) {
-            mAdapter.setMovies(loadMovieImages(data));
+            mAdapter.setMovies(parseJson(data));
             mRecyclerView.setAdapter(mAdapter);
         }
 
@@ -328,7 +323,7 @@ public class MoviesActivity extends AppCompatActivity implements
         public void onReceive(Context context, Intent intent) {
 
             String action = intent.getAction();
-            if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+            if (intent.getAction() != null && intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
 
                 NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
@@ -336,7 +331,7 @@ public class MoviesActivity extends AppCompatActivity implements
 
                 if (isConnected) {
                     String queryUrl = getQueryUrl(mCurrentSortKey);
-                    updateUI(queryUrl);
+                    getJsonResponse(queryUrl);
                     unregisterReceiver(mReceiver);
                 }
 

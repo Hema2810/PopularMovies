@@ -21,6 +21,7 @@ public class MovieInfo implements Parcelable {
             return new MovieInfo[size];
         }
     };
+
     @PrimaryKey
     private int id;
     @Ignore
